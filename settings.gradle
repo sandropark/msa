@@ -1,0 +1,64 @@
+rootProject.name = 'msa'
+
+['saga'].each { moduleName ->
+    makeModule(moduleName)
+}
+
+private void makeModule(String moduleName) {
+    def moduleDir = makeDir(rootDir, moduleName)
+    makeGradle(moduleDir)
+    makeSrc(moduleDir)
+    include ":${moduleName}"
+}
+
+private void makeSubModule(File parentModuleDir, subModuleName) {
+    def subModuleDir = makeDir(parentModuleDir, subModuleName)
+    makeGradle(subModuleDir)
+    makeSrc(subModuleDir)
+
+    def subProjectName = ":${parentModuleDir.name}:${subModuleName}"
+    include subProjectName
+    project(subProjectName).projectDir = subModuleDir
+}
+
+private File makeParentModule(parentModuleName) {
+    def parentModuleDir = makeDir(rootDir, parentModuleName)
+    include ":${parentModuleName}"
+    parentModuleDir
+}
+
+private static File makeDir(File parentDir, String it) {
+    def compDir = new File(parentDir, it)
+
+    if (!compDir.exists())
+        compDir.mkdirs()
+    compDir
+}
+
+private static makeGradle(File compDir) {
+    def gradleFile = new File(compDir.absolutePath, "build.gradle")
+
+    if (!gradleFile.exists()) {
+        gradleFile.text =
+                """
+                dependencies {
+              
+            
+                }
+                """.stripIndent()
+    }
+}
+
+private static makeSrc(File compDir) {
+    [
+            "src/main/java/com/sandro",
+            "src/main/resources",
+            "src/test/java/com/sandro",
+            "src/test/resources"
+    ].each { srcDir ->
+        def srcFolder = new File(compDir.absolutePath, srcDir)
+
+        if (!srcFolder.exists())
+            srcFolder.mkdirs()
+    }
+}

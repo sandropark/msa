@@ -1,0 +1,10 @@
+spring:
+  output:
+    ansi:
+      enabled: always
+  jpa:
+    database: h2
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
